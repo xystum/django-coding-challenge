@@ -1,0 +1,12 @@
+The following licenses are about to expire:
+
+{% for license in licenses %}
+    License ID: {{ license.pk }}
+    License type: {{ license.license_type_name }}
+    Name of the package: {{ license.package_name }}
+    Expiration date: {{ license.expiration_datetime }}
+    POC information of the client: {{ client.poc_contact_name }} / {{ client.poc_contact_email }}
+    {% if not forloop.last %}
+    ------------------------------
+    {% endif %}
+{% endfor %}

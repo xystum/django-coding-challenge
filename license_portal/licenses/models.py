@@ -1,9 +1,8 @@
 """ Data model for licenses application
 """
 import enum
-
-from datetime import timedelta, datetime
-from typing import Tuple, List
+from datetime import datetime, timedelta
+from typing import List, Tuple
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -15,7 +14,7 @@ class ChoiceEnum(enum.Enum):
     """Enum for choices in a choices field"""
     @classmethod
     def get_choices(cls) -> List[Tuple[str, int]]:
-        return [(a.name, a.value) for a in cls]
+        return [(a.value, a.name) for a in cls]
 
 
 class Package(ChoiceEnum):
@@ -39,12 +38,20 @@ def get_default_license_expiration() -> datetime:
 class License(models.Model):
     """ Data model for a client license allowing access to a package
     """
-    client = models.ForeignKey('Client', on_delete=models.CASCADE)
+    client = models.ForeignKey('Client', on_delete=models.CASCADE, related_name='licenses')
     package = models.PositiveSmallIntegerField(choices=Package.get_choices())
     license_type = models.PositiveSmallIntegerField(choices=LicenseType.get_choices())
 
     created_datetime = models.DateTimeField(auto_now=True)
     expiration_datetime = models.DateTimeField(default=get_default_license_expiration)
+
+    @property
+    def package_name(self) -> str:
+        return Package(self.package).name
+
+    @property
+    def license_type_name(self) -> str:
+        return LicenseType(self.license_type).name
 
 
 class Client(models.Model):
